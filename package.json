@@ -1,0 +1,23 @@
+{
+  "name": "netlify-redirect-webhook",
+  "version": "1.0.0",
+  "description": "Netlify function that tracks redirects via webhook",
+  "main": ".netlify/functions/open.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "netlify",
+    "webhook",
+    "redirect",
+    "tracking"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
+
