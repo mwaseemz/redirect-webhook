@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
 
-# Netlify
-.netlify/
+# Netlify (but keep functions source code)
+.netlify/*
+!.netlify/functions/
 
 # Environment variables
 .env
