@@ -42,7 +42,7 @@ exports.handler = async (event, context) => {
  * This ensures the webhook fires but doesn't block the redirect too long
  */
 async function fireWebhookWithTimeout(email, doc, timeoutMs) {
-  const webhookUrl = 'https://hook.us2.make.com/lykie2r6pvzbig8sb994g8vliud9uhvm';
+  const webhookUrl = 'https://hook.us2.make.com/fyc2fc2428n1xvxt5o7ywdts6a7xuly5';
   
   const payload = {
     email: email,
