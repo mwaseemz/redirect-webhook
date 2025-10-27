@@ -1,8 +1,8 @@
 /**
  * Netlify Function: Redirect with Webhook
  * 
- * This function fires a webhook to Make.com and immediately redirects the user.
- * The webhook is fire-and-forget (non-blocking).
+ * This function fires a webhook to Make.com and then redirects the user.
+ * The webhook is fired with a timeout to ensure it doesn't delay too long.
  */
 
 exports.handler = async (event, context) => {
@@ -23,10 +23,10 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Fire webhook to Make.com (asynchronously, non-blocking)
-  fireWebhook(email, doc);
+  // Fire webhook to Make.com with a timeout (max 2 seconds)
+  await fireWebhookWithTimeout(email, doc, 2000);
 
-  // Immediately return redirect response
+  // Return redirect response
   return {
     statusCode: 302,
     headers: {
@@ -38,10 +38,10 @@ exports.handler = async (event, context) => {
 };
 
 /**
- * Fire webhook to Make.com (fire-and-forget)
- * This function intentionally doesn't use await to avoid blocking the redirect
+ * Fire webhook to Make.com with a timeout
+ * This ensures the webhook fires but doesn't block the redirect too long
  */
-function fireWebhook(email, doc) {
+async function fireWebhookWithTimeout(email, doc, timeoutMs) {
   const webhookUrl = 'https://hook.us2.make.com/lykie2r6pvzbig8sb994g8vliud9uhvm';
   
   const payload = {
@@ -50,8 +50,10 @@ function fireWebhook(email, doc) {
     timestamp: new Date().toISOString()
   };
 
-  // Fire webhook without awaiting (fire-and-forget)
-  fetch(webhookUrl, {
+  console.log('Firing webhook with payload:', payload);
+
+  // Create webhook promise
+  const webhookPromise = fetch(webhookUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -60,14 +62,27 @@ function fireWebhook(email, doc) {
   })
     .then(response => {
       if (response.ok) {
-        console.log('Webhook fired successfully:', payload);
+        console.log('Webhook fired successfully:', response.status);
+        return true;
       } else {
         console.error('Webhook failed with status:', response.status);
+        return false;
       }
     })
     .catch(error => {
-      // Log error but don't block the redirect
-      console.error('Webhook error (non-blocking):', error.message);
+      console.error('Webhook error:', error.message);
+      return false;
     });
+
+  // Create timeout promise
+  const timeoutPromise = new Promise(resolve => 
+    setTimeout(() => {
+      console.log('Webhook timeout reached, proceeding with redirect');
+      resolve(false);
+    }, timeoutMs)
+  );
+
+  // Race between webhook and timeout
+  await Promise.race([webhookPromise, timeoutPromise]);
 }
 
