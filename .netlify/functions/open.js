@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
 
   // Extract all query parameters
   const params = event.queryStringParameters || {};
-  const { email = '', doc, utm_source, utm_medium, utm_campaign, utm_term, utm_content, source, ...otherParams } = params;
+  const { email = '', doc, first_name, last_name, utm_source, utm_medium, utm_campaign, utm_term, utm_content, source, ...otherParams } = params;
 
   // Validate required doc parameter
   if (!doc) {
@@ -27,6 +27,8 @@ exports.handler = async (event, context) => {
   // Prepare tracking data
   const trackingData = {
     email,
+    first_name,
+    last_name,
     doc,
     utm_source,
     utm_medium,
